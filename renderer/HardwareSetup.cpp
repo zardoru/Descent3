@@ -62,26 +62,23 @@ void g3_GetProjectionMatrix(float zoom, float *projMat) {
   int viewportWidth, viewportHeight;
   rend_GetProjectionParameters(&viewportWidth, &viewportHeight);
 
-  // compute aspect ratio for this ViewPort
-  float screenAspect = rend_GetAspectRatio();
-  if (sAspect != 0.0f) {
-    // check for user override
-    screenAspect = screenAspect * 4.0f / 3.0f / sAspect;
-  }
-  float s = screenAspect * ((float)viewportWidth) / ((float)viewportHeight);
+  float aspectRatio = (float)viewportWidth / (float)viewportHeight;
 
   // setup the matrix
   memset(projMat, 0, sizeof(float) * 16);
 
-  // calculate 1/tan(fov)
-  float oOT = 1.0f / zoom;
-
   // fill in the matrix
-  projMat[0] = oOT;
-  projMat[5] = oOT * s;
-  projMat[10] = 1.0f;
-  projMat[11] = 1.0f;
-  projMat[14] = -1.0f;
+  // Calculate 1/tan(fov / 2), fov expected in degrees
+  float fov = 110.0f * zoom;
+  float fovy = fov * 3.14159265f / 180.0f; // Convert degrees to radians
+  float oOT = 1.0f / tan(fovy / 2.0f);
+
+  // Fill in the matrix for a typical perspective projection
+  projMat[0] = oOT / aspectRatio; // Scale x-axis by aspect ratio
+  projMat[5] = oOT;               // y-axis scaling
+  projMat[10] = 1.0f;            // Define z-axis for projection (assuming zFar >> zNear)
+  projMat[11] = 1.0f;            // Indicate a projection matrix
+  projMat[14] = -1.0f * (1.0f - 1e-7f);            // Near plane at -1 units
 }
 
 // start the frame
