@@ -851,32 +851,6 @@ int opengl_Init(oeApplication *app, renderer_preferred_state *pref_state) {
 
   hOpenGLDC = GetDC(hOpenGLWnd);
 
-  if (WindowGL) {
-    RECT rect;
-    POINT topLeft;
-    GetClientRect((HWND)hOpenGLWnd, &rect);
-
-    topLeft.x = rect.left;
-    topLeft.y = rect.top;
-    ClientToScreen((HWND)hOpenGLWnd, &topLeft);
-
-    width = rect.right - rect.left + 1;
-    height = rect.bottom - rect.top + 1;
-    windowX = topLeft.x;
-    windowY = topLeft.y;
-  } else {
-    SetWindowPos(hOpenGLWnd, HWND_TOPMOST, 0, 0, OpenGL_preferred_state.width, OpenGL_preferred_state.height,
-                 SWP_FRAMECHANGED);
-    width = OpenGL_preferred_state.width;
-    height = OpenGL_preferred_state.height;
-    RECT rect;
-    GetWindowRect((HWND)hOpenGLWnd, &rect);
-    mprintf((0, "rect=%d %d %d %d\n", rect.top, rect.right, rect.bottom, rect.left));
-  }
-
-  OpenGL_state.screen_width = width;
-  OpenGL_state.screen_height = height;
-
   if (!opengl_Setup(hOpenGLDC)) {
     opengl_Close();
     return 0;
